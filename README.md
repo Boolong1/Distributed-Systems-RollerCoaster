@@ -46,6 +46,33 @@ flowchart LR
 
 Alle Clients sprechen mit **einer** `StationHandler`-Instanz. Blockierende Calls (z. B. `i_am_boarding`, `arrive`) hängen serverseitig in `wait()`, bis ihre Bedingung erfüllt ist – der Client wartet einfach auf die RPC-Antwort.
 
+### Ablauf einer Fahrt (Kapazität c)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant W as Wagen
+    participant S as Station
+    participant P as Passagier (1 von c)
+
+    W->>S: arrive(wagonId)
+    Note over S: Wagen in platformQueue,<br/>blockiert bis vorne UND voll
+    P->>S: i_am_boarding(passengerId)
+    Note over S: Passagier in waitingPassengers,<br/>blockiert bis vorne UND Platz frei
+    S-->>P: wagonId
+    P->>S: wait_for_ride_end(passengerId)
+    Note over S: blockiert bis Fahrt vorbei
+    S-->>W: (Wagen voll)
+    W->>S: departure(wagonId)
+    Note over W: Fahrt (sleep fahrzeitMs + Zufall)
+    W->>S: ride_finished(wagonId)
+    Note over S: wartet bis Wagen vorne auf track<br/>(kein Überholen), setzt rideOver
+    S-->>P: (Fahrt vorbei)
+    P->>S: i_am_disembarking(passengerId)
+    S-->>W: (alle ausgestiegen)
+    Note over W,P: Wagen fährt wieder ein,<br/>Passagier stellt sich erneut an
+```
+
 ## Projektstruktur
 
 ```

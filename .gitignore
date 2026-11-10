@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Java-Build (wird mit javac erzeugt, siehe README)
+build/
+
+# Laufzeit-Logs
+logs/
+
+# Editor / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
